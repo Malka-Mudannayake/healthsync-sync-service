@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: data-sync-cronjob
+spec:
+  schedule: "*/1 * * * *"  # This schedules the CronJob to run every minute
+  successfulJobsHistoryLimit: 1  # Keep only the last successful job
+  failedJobsHistoryLimit: 1      # Keep only the last failed job
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 60
+      template:
+        spec:
+          containers:
+            - name: sync-service
+              image: 209479279888.dkr.ecr.ap-southeast-1.amazonaws.com/healthsync/sync-service:latest
+              env:
+              - name: AWS_ACCESS_KEY_ID
+                value: "AKIATBRPQEUICDZTOPQY"
+              - name: AWS_SECRET_ACCESS_KEY
+                value: "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"
+              - name: AWS_DEFAULT_REGION
+                value: "ap-southeast-1"
+          restartPolicy: OnFailure
+
