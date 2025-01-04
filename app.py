@@ -23,7 +23,7 @@ patient_table = 'patients'
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, (datetime, date)):  # Handle datetime and date objects
-            return obj.isoformat()  # Convert to ISO 8601 format (e.g., "2025-01-01")
+            return obj.isoformat()  # Convert to ISO 8601 format (e.g., "2025-01-01") 
         return super().default(obj)
     
 
