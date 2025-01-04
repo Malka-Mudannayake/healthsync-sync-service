@@ -114,9 +114,9 @@ def save_metrics_to_s3():
         appointment_csv = appointment_frequency_df.to_csv(index=False)
 
         # Save to S3
-        s3.put_object(Bucket='healthsyncc', Key='metrics_data/doctor_metrics.csv', Body=doctor_csv)
-        s3.put_object(Bucket='healthsyncc', Key='metrics_data/symptom_metrics.csv', Body=symptom_csv)
-        s3.put_object(Bucket='healthsyncc', Key='metrics_data/appointment_metrics.csv', Body=appointment_csv)
+        s3.put_object(Bucket='healthsync-data', Key='metrics_data/doctor_metrics.csv', Body=doctor_csv)
+        s3.put_object(Bucket='healthsync-data', Key='metrics_data/symptom_metrics.csv', Body=symptom_csv)
+        s3.put_object(Bucket='healthsync-data', Key='metrics_data/appointment_metrics.csv', Body=appointment_csv)
     
         print('save_metrics_to_s3 success')
     
