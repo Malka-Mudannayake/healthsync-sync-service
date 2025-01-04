@@ -49,6 +49,7 @@ def aggregate_metrics():
     appointments = get_appointments()
     bookings = get_bookings()
     doctors = get_doctors()
+    patients = get_patients()
 
     # Prepare data structures for aggregation
     doctor_appointments = {}
@@ -93,6 +94,16 @@ def aggregate_metrics():
     specialty_data = [{"diagnosis": diagnosis, "count": count} for diagnosis, count in symptom_counter.items()]
     appointment_frequency_data = [{"date": date, "frequency": frequency} for date, frequency in appointment_frequency.items()]
 
+    # Count patients by gender
+    gender_counter = Counter()
+    for patient in patients:
+        gender = patient.get('gender', {}).get('S', 'Unknown')
+        gender_counter[gender] += 1
+
+    # Create DataFrame for gender metrics
+    gender_data = [{"gender": gender, "count": count} for gender, count in gender_counter.items()]
+
+    gender_df = pd.DataFrame(gender_data)
     doctor_df = pd.DataFrame(doctor_data)
     symptom_df = pd.DataFrame(specialty_data)
     appointment_frequency_df = pd.DataFrame(appointment_frequency_data)
@@ -100,23 +111,25 @@ def aggregate_metrics():
     # Merge with doctor details to get specialization information
     doctor_df['specialization'] = doctor_df['doctor_id'].apply(lambda doctor_id: next(d['specialization']['S'] for d in doctors if d['doctor_id']['S'] == doctor_id))
 
-    return doctor_df, symptom_df, appointment_frequency_df
+    return doctor_df, symptom_df, appointment_frequency_df, gender_df
 
 
 # Save metrics to CSV and upload to S3
 def save_metrics_to_s3():
     try:
-        doctor_df, symptom_df, appointment_frequency_df = aggregate_metrics()
+        doctor_df, symptom_df, appointment_frequency_df, gender_df = aggregate_metrics()
 
         # Save doctor metrics to CSV
         doctor_csv = doctor_df.to_csv(index=False)
         symptom_csv = symptom_df.to_csv(index=False)
         appointment_csv = appointment_frequency_df.to_csv(index=False)
+        gender_csv = gender_df.to_csv(index=False)
 
         # Save to S3
         s3.put_object(Bucket='healthsync-data', Key='metrics_data/doctor_metrics.csv', Body=doctor_csv)
         s3.put_object(Bucket='healthsync-data', Key='metrics_data/symptom_metrics.csv', Body=symptom_csv)
         s3.put_object(Bucket='healthsync-data', Key='metrics_data/appointment_metrics.csv', Body=appointment_csv)
+        s3.put_object(Bucket='healthsync-data', Key='metrics_data/patient_gender_metrics.csv', Body=gender_csv)
     
         print('save_metrics_to_s3 success')
     
