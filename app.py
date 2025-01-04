@@ -5,7 +5,7 @@ from datetime import datetime, date
 import json
 import io
 
-# Initialize DynamoDB client
+# Initialize DynamoDB client 
 dynamodb = boto3.client('dynamodb')
 s3 = boto3.client('s3')
 response = s3.list_buckets()
